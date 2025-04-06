@@ -21,7 +21,7 @@ jobs:
       - name: Deploy existing ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: arn:aws:ecs:us-east-1:503561421231:task-definition/medusa-task:1
+          task-definition: ecs-task-def.json
           service: medusa-service
           cluster: medusa-cluster
           wait-for-service-stability: true
