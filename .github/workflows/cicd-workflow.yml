@@ -18,10 +18,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Get latest task definition ARN
+        id: get-task-def
+        run: |
+          TASK_DEF_ARN=$(aws ecs list-task-definitions --family-prefix medusa-task --sort DESC --max-items 1 --query 'taskDefinitionArns[0]' --output text)
+          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+          echo "Latest task definition: $TASK_DEF_ARN"
+
       - name: Deploy existing ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ecs-task-def.json
+          task-definition: ${{ env.TASK_DEF_ARN }}
           service: medusa-service
           cluster: medusa-cluster
           wait-for-service-stability: true
