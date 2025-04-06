@@ -35,24 +35,15 @@ resource "aws_ecs_task_definition" "medusa_task" {
   memory                   = "512"
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
 
-  container_definitions = jsonencode([
-    {
-      name      = "medusa"
-      image     = "503561421231.dkr.ecr.us-east-1.amazonaws.com/medus-image-repo:latest"
-      essential = true
-      portMappings = [
-        {
-          containerPort = 9000
-        }
-      ],
-      environment = [
-        {
-          name  = "DATABASE_URL"
-          value = "postgres://medusauser:MedusaDBStrongPassword123!@${aws_db_instance.medusa_postgres.address}:5432/medusadb"
-        }
-      ]
-    }
-  ])
+  container_definitions = jsonencode([{
+    name      = "medusa"
+    image     = "503561421231.dkr.ecr.us-east-1.amazonaws.com/medus-image-repo:latest"
+    essential = true
+    portMappings = [{
+      containerPort = 9000
+    }]
+    # RDS environment variable removed for now
+  }])
 }
 
 resource "aws_ecs_service" "medusa_service" {
