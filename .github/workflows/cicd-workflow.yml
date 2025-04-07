@@ -20,23 +20,24 @@ jobs:
           aws-region: us-east-1
 
       - name: Get latest task definition ARN
-        id: get-task-def
-        run: |
-          TASK_DEF_ARN=$(aws ecs list-task-definitions \
-            --family-prefix medusa-task \
-            --sort DESC \
-            --max-items 1 \
-            --query 'taskDefinitionArns[0]' \
-            --output text | tr -d '\r')
+  id: get-task-def
+  run: |
+    TASK_DEF_ARN=$(aws ecs list-task-definitions \
+      --family-prefix medusa-task \
+      --sort DESC \
+      --max-items 1 \
+      --query 'taskDefinitionArns[0]' \
+      --output text | tr -d '\r')
 
-          echo "Latest task definition: $TASK_DEF_ARN"
+    echo "Latest task definition: $TASK_DEF_ARN"
 
-          if [ -z "$TASK_DEF_ARN" ]; then
-            echo "❌ Task definition ARN not found. Exiting..."
-            exit 1
-          fi
+    if [ -z "$TASK_DEF_ARN" ]; then
+      echo "❌ Task definition ARN not found. Exiting..."
+      exit 1
+    fi
 
-          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+    echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+
 
       - name: Deploy latest ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
