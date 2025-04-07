@@ -19,10 +19,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Deploy ECS task definition directly
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: arn:aws:ecs:us-east-1:503561421231:task-definition/medusa-task:3
-          service: medusa-service
-          cluster: medusa-cluster
-          wait-for-service-stability: true
+      - name: Force new ECS deployment
+        run: |
+          echo "🔁 Forcing ECS service deployment..."
+          aws ecs update-service \
+            --cluster medusa-cluster \
+            --service medusa-service \
+            --force-new-deployment
