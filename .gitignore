@@ -1,1 +1,16 @@
 node_modules/
+# Ignore Terraform working directory and provider binaries
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform-provider-*
+
+# Ignore state files
+terraform/*.tfstate
+terraform/*.tfstate.backup
+
+# Ignore JSON definitions (unless needed)
+terraform/*.json
+
+# Optional: ignore license or readme if not required
+terraform/LICENSE.txt
+
