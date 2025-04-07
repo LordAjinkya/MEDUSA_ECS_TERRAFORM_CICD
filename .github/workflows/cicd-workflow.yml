@@ -19,9 +19,32 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Get latest task definition ARN
+      name: Deploy-only
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Get latest ECS task definition ARN
         id: get-task-def
         run: |
+          echo "🔍 Fetching latest task definition..."
+
           TASK_DEF_ARN=$(aws ecs list-task-definitions \
             --family-prefix medusa-task \
             --sort DESC \
@@ -29,19 +52,20 @@ jobs:
             --query 'taskDefinitionArns[0]' \
             --output text | tr -d '\r')
 
-          echo "Latest task definition: $TASK_DEF_ARN"
+          echo "🧾 Raw ARN: $TASK_DEF_ARN"
 
-          if [ -z "$TASK_DEF_ARN" ]; then
+          if [ -z "$TASK_DEF_ARN" ] || [[ "$TASK_DEF_ARN" == "None" ]]; then
             echo "❌ Task definition ARN not found. Exiting..."
             exit 1
           fi
 
-          echo "TASK_DEF_ARN=$TASK_DEF_ARN" >> $GITHUB_ENV
+          echo "✅ Found task definition: $TASK_DEF_ARN"
+          echo "task_def_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
 
       - name: Deploy latest ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ env.TASK_DEF_ARN }}
+          task-definition: ${{ steps.get-task-def.outputs.task_def_arn }}
           service: medusa-service
           cluster: medusa-cluster
           wait-for-service-stability: true
