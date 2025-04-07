@@ -19,31 +19,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Get latest ECS task definition ARN
-        id: get-task-def
-        run: |
-          echo "🔍 Fetching latest task definition..."
-          TASK_DEF_ARN=$(aws ecs list-task-definitions \
-            --family-prefix medusa-task \
-            --sort DESC \
-            --max-items 1 \
-            --query 'taskDefinitionArns[0]' \
-            --output text | tr -d '\r')
-          
-          echo "🧾 Raw ARN: $TASK_DEF_ARN"
-
-          if [ -z "$TASK_DEF_ARN" ] || [[ "$TASK_DEF_ARN" == "None" ]]; then
-            echo "❌ Task definition ARN not found. Exiting..."
-            exit 1
-          fi
-
-          echo "✅ Found task definition: $TASK_DEF_ARN"
-          echo "task_def_arn=${TASK_DEF_ARN}" >> "$GITHUB_OUTPUT"
-
-      - name: Deploy latest ECS task definition
+      - name: Deploy ECS task definition directly
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ steps.get-task-def.outputs.task_def_arn }}
+          task-definition: arn:aws:ecs:us-east-1:503561421231:task-definition/medusa-task:3
           service: medusa-service
           cluster: medusa-cluster
           wait-for-service-stability: true
