@@ -35,7 +35,7 @@ jobs:
             exit 1
           fi
           echo "✅ Found task definition: $TASK_DEF_ARN"
-          echo "task_def_arn=$TASK_DEF_ARN" >> $GITHUB_OUTPUT
+          echo "task_def_arn=${TASK_DEF_ARN}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy latest ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
