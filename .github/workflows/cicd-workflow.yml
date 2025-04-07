@@ -29,11 +29,14 @@ jobs:
             --max-items 1 \
             --query 'taskDefinitionArns[0]' \
             --output text | tr -d '\r')
+          
           echo "🧾 Raw ARN: $TASK_DEF_ARN"
+
           if [ -z "$TASK_DEF_ARN" ] || [[ "$TASK_DEF_ARN" == "None" ]]; then
             echo "❌ Task definition ARN not found. Exiting..."
             exit 1
           fi
+
           echo "✅ Found task definition: $TASK_DEF_ARN"
           echo "task_def_arn=${TASK_DEF_ARN}" >> "$GITHUB_OUTPUT"
 
